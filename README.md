@@ -14,7 +14,6 @@ backend/
 │   ├── config.py       # Environment variables configuration
 │   ├── database.py     # Database configuration
 │   └── main.py         # Application entry point
-├── .env.example        # Environment variables template
 ├── .gitignore          # Git ignore file
 ├── requirements.txt    # Project dependencies
 └── README.md           # Documentation
@@ -31,11 +30,6 @@ Ensure you have installed:
 - PostgreSQL
 
 ### 2. Set up Virtual Environment
-
-Navigate to the backend directory:
-```bash
-cd backend
-```
 
 **Mac/Linux:**
 ```bash
