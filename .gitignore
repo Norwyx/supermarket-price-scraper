@@ -138,3 +138,7 @@ cython_debug/
 .vscode/
 .idea/
 .DS_Store
+
+# Personal docs
+docs/
+PROJECT_ROADMAP.md
