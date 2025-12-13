@@ -140,5 +140,4 @@ cython_debug/
 .DS_Store
 
 # Personal docs
-docs/
-PROJECT_ROADMAP.md
+/docs
