@@ -3,6 +3,7 @@ import pytest
 from sqlmodel import select
 from app.models.supermarket import Supermarket
 from app.models.category import Category
+from app.models.product import Product
 
 
 class TestSupermarketModel:
@@ -167,4 +168,143 @@ class TestCategoryModel:
         statement = select(Category).where(Category.id == category_id)
         result = db_session.exec(statement).first()
         assert result is None
+
+
+class TestProductModel:
+    """
+    CRUD tests for Product model
+    """
+    
+    def test_create_product(self, db_session):
+        """Test creating a product record"""
+        category = Category(
+            name="Lácteos, huevos y refrigerados",
+            slug="lacteos-huevos-y-refrigerados",
+            image_url="https://example.com/image.png"
+        )
+        db_session.add(category)
+        db_session.commit()
+        db_session.refresh(category)
+
+        product = Product(
+            name="Leche Entera Pasteurizada Colanta (1000ML)",
+            variant="1L",
+            sku="7702129001052UND",
+            description="Leche Entera Pasteurizada Colanta de 1L en bolsa.",
+            image_url="https://example.com/image.png",
+            category_id=category.id
+        )
+        db_session.add(product)
+        db_session.commit()
+        db_session.refresh(product)
+        
+        assert product.id is not None
+        assert product.name == "Leche Entera Pasteurizada Colanta (1000ML)"
+        assert product.variant == "1L"
+        assert product.sku == "7702129001052UND"
+        assert product.description == "Leche Entera Pasteurizada Colanta de 1L en bolsa."
+        assert product.image_url == "https://example.com/image.png"
+        assert product.category_id == category.id
+        assert product.created_at is not None
+
+    def test_read_product(self, db_session):
+        """Test reading a product record""" 
+        category = Category(
+            name="Lácteos, huevos y refrigerados",
+            slug="lacteos-huevos-y-refrigerados",
+            image_url="https://example.com/image.png"
+        )
+        db_session.add(category)
+        db_session.commit()
+        db_session.refresh(category)
+
+        product = Product(
+            name="Leche Entera Pasteurizada Colanta (1000ML)",
+            variant="1L",
+            sku="7702129001052UND",
+            description="Leche Entera Pasteurizada Colanta de 1L en bolsa.",
+            image_url="https://example.com/image.png",
+            category_id=category.id
+        )
+        db_session.add(product)
+        db_session.commit()
+        db_session.refresh(product)
+
+        statement = select(Product).where(Product.name == "Leche Entera Pasteurizada Colanta (1000ML)")
+        result = db_session.exec(statement).first()
+
+        assert result is not None
+        assert result.name == "Leche Entera Pasteurizada Colanta (1000ML)"
+        assert result.variant == "1L"
+        assert result.sku == "7702129001052UND"
+        assert result.description == "Leche Entera Pasteurizada Colanta de 1L en bolsa."
+        assert result.image_url == "https://example.com/image.png"
+        assert result.category_id == category.id
+        assert result.created_at is not None
+
+    def test_update_product(self, db_session):
+        """Test updating a product record"""
+        category = Category(
+            name="Lácteos, huevos y refrigerados",
+            slug="lacteos-huevos-y-refrigerados",
+            image_url="https://example.com/image.png"
+        )
+        db_session.add(category)
+        db_session.commit()
+        db_session.refresh(category)
+
+        product = Product(
+            name="Leche Entera Pasteurizada Colanta (1000ML)",
+            variant="1L",
+            sku="7702129001052UND",
+            description="Leche Entera Pasteurizada Colanta de 1L en bolsa.",
+            image_url="https://example.com/image.png",
+            category_id=category.id
+        )
+        db_session.add(product)
+        db_session.commit()
+        db_session.refresh(product)
+
+        product.name = "Leche Entera Pasteurizada Colanta (1000ML)"
+        db_session.add(product)
+        db_session.commit()
+        db_session.refresh(product)
+
+        assert product.name == "Leche Entera Pasteurizada Colanta (1000ML)"
+        
+        statement = select(Product).where(Product.id == product.id)
+        updated = db_session.exec(statement).first()
+        assert updated.name == "Leche Entera Pasteurizada Colanta (1000ML)"
+
+    def test_delete_product(self, db_session):
+        """Test deleting a product record"""
+        category = Category(
+            name="Lácteos, huevos y refrigerados",
+            slug="lacteos-huevos-y-refrigerados",
+            image_url="https://example.com/image.png"
+        )
+        db_session.add(category)
+        db_session.commit()
+        db_session.refresh(category)
+
+        product = Product(
+            name="Leche Entera Pasteurizada Colanta (1000ML)",
+            variant="1L",
+            sku="7702129001052UND",
+            description="Leche Entera Pasteurizada Colanta de 1L en bolsa.",
+            image_url="https://example.com/image.png",
+            category_id=category.id
+        )
+        db_session.add(product)
+        db_session.commit()
+        db_session.refresh(product)
+
+        db_session.delete(product)
+        db_session.commit()
+
+        statement = select(Product).where(Product.id == product.id)
+        result = db_session.exec(statement).first()
+        assert result is None
+    
+
 
