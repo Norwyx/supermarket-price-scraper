@@ -7,3 +7,4 @@ requests
 pydantic-settings
 alembic
 pytest
+python-dateutil

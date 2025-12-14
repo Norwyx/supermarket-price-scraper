@@ -20,8 +20,8 @@ class Price(SQLModel, table=True):
     price: float = Field(index=True)
     url: Optional[str] = Field(default=None)
     original_price: Optional[float] = Field(default=None)
-    scraped_at: datetime = Field(index=True, default_factory=datetime.utcnow)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    scraped_at: datetime = Field(index=True, default_factory=lambda: datetime.now(timezone.utc)) 
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     
     def __repr__(self) -> str:
         return f"Price(id={self.id}, product_id={self.product_id}, supermarket_id={self.supermarket_id}, price={self.price}, original_price={self.original_price}, url={self.url}, scraped_at={self.scraped_at})"

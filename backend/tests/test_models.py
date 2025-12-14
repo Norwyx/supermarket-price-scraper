@@ -1,9 +1,9 @@
 # backend/tests/test_models.py
 import pytest
 from sqlmodel import select
-from app.models.supermarket import Supermarket
-from app.models.category import Category
-from app.models.product import Product
+from dateutil.parser import parse
+from datetime import datetime, timezone
+from app.models import Supermarket, Category, Product, Price
 
 
 class TestSupermarketModel:
@@ -307,4 +307,141 @@ class TestProductModel:
         assert result is None
     
 
+class TestPriceModel:
+    """
+    CRUD tests for Price model
+    """
+
+    scraped_at_str = "2022-01-01T00:00:00Z"
+    scraped_at_dt = parse(scraped_at_str)
+    
+    def setup_data_for_test(self, db_session):
+        """Aux function to create Supermarket, Category, Product for Price tests"""
+        supermarket = Supermarket(
+            name="Test Supermarket",
+            website_url="https://example.com",
+            logo_url="https://example.com/logo.png",
+        )
+        db_session.add(supermarket)
+        
+        category = Category(
+            name="Lácteos, huevos y refrigerados",
+            slug="lacteos-huevos-y-refrigerados",
+            image_url="https://example.com/image.png"
+        )
+        db_session.add(category)
+        db_session.commit()
+        db_session.refresh(supermarket)
+        db_session.refresh(category)
+
+        product = Product(
+            name="Leche Entera Pasteurizada Colanta (1000ML)",
+            variant="1L",
+            sku="7702129001052UND",
+            description="Leche Entera Pasteurizada Colanta de 1L en bolsa.",
+            image_url="https://example.com/image.png",
+            category_id=category.id
+        )
+        db_session.add(product)
+        db_session.commit()
+        db_session.refresh(product)
+        
+        return supermarket, category, product
+
+    def test_create_price(self, db_session):
+        """Test creating a price record."""
+        supermarket, _, product = self.setup_data_for_test(db_session)
+
+        price = Price(
+            product_id=product.id,
+            supermarket_id=supermarket.id,
+            price=3.900,
+            original_price=4.100,
+            url="https://supermarket.com/product/leche-colanta-1l",
+            scraped_at=self.scraped_at_dt
+        )
+
+        db_session.add(price)
+        db_session.commit()
+        db_session.refresh(price)
+
+        assert price.id is not None
+        assert price.product_id == product.id
+        assert price.price == 3.900
+        assert price.original_price == 4.100
+        assert price.scraped_at.replace(tzinfo=None) == self.scraped_at_dt.replace(tzinfo=None)
+        assert price.created_at is not None
+
+    def test_read_price(self, db_session):
+        """Test reading a price record."""
+        supermarket, _, product = self.setup_data_for_test(db_session)
+
+        initial_price = Price(
+            product_id=product.id,
+            supermarket_id=supermarket.id,
+            price=4.100,
+            scraped_at=self.scraped_at_dt
+        )
+        db_session.add(initial_price)
+        db_session.commit()
+        db_session.refresh(initial_price)
+
+        statement = select(Price).where(Price.id == initial_price.id)
+        result = db_session.exec(statement).first()
+
+        assert result is not None
+        assert result.price == 4.100
+        assert result.product_id == product.id
+        assert result.scraped_at.replace(tzinfo=None) == self.scraped_at_dt.replace(tzinfo=None)
+
+    def test_update_price(self, db_session):
+        """Test updating a price record."""
+        supermarket, _, product = self.setup_data_for_test(db_session)
+        
+        price = Price(
+            product_id=product.id,
+            supermarket_id=supermarket.id,
+            price=3.900,
+            scraped_at=self.scraped_at_dt
+        )
+        db_session.add(price)
+        db_session.commit()
+        db_session.refresh(price)
+        
+        original_created_at = price.created_at
+
+        price.price = 5.000
+        price.original_price = 6.000
+        
+        db_session.add(price)
+        db_session.commit()
+        db_session.refresh(price)
+
+        assert price.price == 5.000
+        assert price.original_price == 6.000
+        assert price.created_at == original_created_at
+
+    def test_delete_price(self, db_session):
+        """Test deleting a price record."""
+        supermarket, _, product = self.setup_data_for_test(db_session)
+        
+        price = Price(
+            product_id=product.id,
+            supermarket_id=supermarket.id,
+            price=10.000,
+            scraped_at=self.scraped_at_dt
+        )
+        db_session.add(price)
+        db_session.commit()
+        db_session.refresh(price)
+        
+        price_id = price.id 
+
+        db_session.delete(price)
+        db_session.commit()
+
+        statement = select(Price).where(Price.id == price_id)
+        result = db_session.exec(statement).first()
+
+        assert result is None
 
