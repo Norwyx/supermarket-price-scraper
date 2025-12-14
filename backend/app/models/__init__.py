@@ -2,7 +2,7 @@ from .supermarket import Supermarket
 from .category import Category
 from .product import Product
 from .price import Price
-from .scraping_job import ScrapingJob
+from .scraping_job import ScrapingJob, ScrapingJobStatus
 
 __all__ = [
     "Supermarket",
@@ -10,4 +10,5 @@ __all__ = [
     "Product",
     "Price",
     "ScrapingJob",
+    "ScrapingJobStatus",
 ]

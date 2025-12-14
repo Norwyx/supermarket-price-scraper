@@ -1,9 +1,8 @@
-# backend/tests/test_models.py
 import pytest
 from sqlmodel import select
 from dateutil.parser import parse
 from datetime import datetime, timezone
-from app.models import Supermarket, Category, Product, Price
+from app.models import Supermarket, Category, Product, Price, ScrapingJob, ScrapingJobStatus
 
 
 class TestSupermarketModel:
@@ -445,3 +444,145 @@ class TestPriceModel:
 
         assert result is None
 
+
+class TestScrapingJobModel:
+    """
+    CRUD tests for ScrapingJob model
+    """
+
+    scraped_at_str = "2022-01-01T00:00:00Z"
+    scraped_at_dt = parse(scraped_at_str)
+    
+    def setup_data_for_test(self, db_session):
+        """Aux function to create Supermarket, Category, Product for Price tests"""
+        supermarket = Supermarket(
+            name="Test Supermarket",
+            website_url="https://example.com",
+            logo_url="https://example.com/logo.png",
+        )
+        db_session.add(supermarket)
+        
+        category = Category(
+            name="Lácteos, huevos y refrigerados",
+            slug="lacteos-huevos-y-refrigerados",
+            image_url="https://example.com/image.png"
+        )
+        db_session.add(category)
+        db_session.commit()
+        db_session.refresh(supermarket)
+        db_session.refresh(category)
+
+        product = Product(
+            name="Leche Entera Pasteurizada Colanta (1000ML)",
+            variant="1L",
+            sku="7702129001052UND",
+            description="Leche Entera Pasteurizada Colanta de 1L en bolsa.",
+            image_url="https://example.com/image.png",
+            category_id=category.id
+        )
+        db_session.add(product)
+        db_session.commit()
+        db_session.refresh(product)
+        
+        return supermarket, category, product
+    
+    def test_create_scraping_job(self, db_session):
+        """Test creating a scraping job record."""
+        supermarket, _, _ = self.setup_data_for_test(db_session)
+
+        scraping_job = ScrapingJob(
+            supermarket_id=supermarket.id,
+            status=ScrapingJobStatus.PENDING,
+            products_scraped=0,
+            errors_count=0,
+            error_message=None
+        )
+
+        db_session.add(scraping_job)
+        db_session.commit()
+        db_session.refresh(scraping_job)
+
+        assert scraping_job.id is not None
+        assert scraping_job.supermarket_id == supermarket.id
+        assert scraping_job.status == ScrapingJobStatus.PENDING
+        assert scraping_job.products_scraped == 0
+        assert scraping_job.errors_count == 0
+        assert scraping_job.error_message is None
+
+    def test_read_scraping_job(self, db_session):
+        """Test reading a scraping job record."""
+        supermarket, _, _ = self.setup_data_for_test(db_session)
+
+        initial_job = ScrapingJob(
+            supermarket_id=supermarket.id,
+            status=ScrapingJobStatus.IN_PROGRESS,
+            products_scraped=10,
+            errors_count=1,
+            error_message="Sample error"
+        )
+        db_session.add(initial_job)
+        db_session.commit()
+        db_session.refresh(initial_job)
+
+        statement = select(ScrapingJob).where(ScrapingJob.id == initial_job.id)
+        result = db_session.exec(statement).first()
+
+        assert result is not None
+        assert result.status == ScrapingJobStatus.IN_PROGRESS
+        assert result.products_scraped == 10
+        assert result.errors_count == 1
+        assert result.error_message == "Sample error"
+
+    def test_update_scraping_job(self, db_session):
+        """Test updating a scraping job record."""
+        supermarket, _, _ = self.setup_data_for_test(db_session)
+        
+        scraping_job = ScrapingJob(
+            supermarket_id=supermarket.id,
+            status=ScrapingJobStatus.PENDING,
+            products_scraped=0,
+            errors_count=0,
+            error_message=None
+        )
+        db_session.add(scraping_job)
+        db_session.commit()
+        db_session.refresh(scraping_job)
+
+        scraping_job.status = ScrapingJobStatus.COMPLETED
+        scraping_job.products_scraped = 100
+        scraping_job.errors_count = 0
+        scraping_job.error_message = "No errors"
+        
+        db_session.add(scraping_job)
+        db_session.commit()
+        db_session.refresh(scraping_job)
+
+        assert scraping_job.status == ScrapingJobStatus.COMPLETED
+        assert scraping_job.products_scraped == 100
+        assert scraping_job.errors_count == 0
+        assert scraping_job.error_message == "No errors"
+
+    def test_delete_scraping_job(self, db_session):
+        """Test deleting a scraping job record."""
+        supermarket, _, _ = self.setup_data_for_test(db_session)
+        
+        scraping_job = ScrapingJob(
+            supermarket_id=supermarket.id,
+            status=ScrapingJobStatus.FAILED,
+            products_scraped=50,
+            errors_count=5,
+            error_message="Some errors occurred"
+        )
+        db_session.add(scraping_job)
+        db_session.commit()
+        db_session.refresh(scraping_job)
+        
+        job_id = scraping_job.id 
+
+        db_session.delete(scraping_job)
+        db_session.commit()
+
+        statement = select(ScrapingJob).where(ScrapingJob.id == job_id)
+        result = db_session.exec(statement).first()
+
+        assert result is None
