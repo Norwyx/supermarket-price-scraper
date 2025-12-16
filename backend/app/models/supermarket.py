@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel, Field
 from datetime import datetime, timezone
 from typing import Optional
+from sqlalchemy import func, Column, DateTime
 
 
 class Supermarket(SQLModel, table=True):
@@ -13,8 +14,21 @@ class Supermarket(SQLModel, table=True):
     name: str = Field(index=True, unique=True, max_length=255)
     website_url: str = Field(max_length=500)
     logo_url: Optional[str] = Field(default=None, max_length=500)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(
+        sa_column=Column(
+            DateTime(timezone=True), 
+            server_default=func.now(),
+            nullable=False
+        )
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(
+            DateTime(timezone=True), 
+            server_default=func.now(), 
+            onupdate=func.now(),       
+            nullable=False
+        )
+    )
     
     def __repr__(self) -> str:
         return f"Supermarket(id={self.id}, name='{self.name}')"
