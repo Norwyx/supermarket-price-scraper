@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel, Field
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Optional
+from sqlalchemy import func, Column, DateTime
 
 
 class Category(SQLModel, table=True):
@@ -14,7 +15,13 @@ class Category(SQLModel, table=True):
     slug: str = Field(index=True, unique=True, max_length=255)
     image_url: Optional[str] = Field(default=None, max_length=500)
     parent_id: Optional[int] = Field(default=None, foreign_key="categories.id", index=True)
-    created_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(
+        sa_column=Column(
+            DateTime(timezone=True), 
+            server_default=func.now(),
+            nullable=False
+        )
+    )
     
     def __repr__(self) -> str:
         return f"Category(id={self.id}, name='{self.name}')"
