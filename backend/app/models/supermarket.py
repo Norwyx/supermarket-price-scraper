@@ -1,5 +1,5 @@
 from sqlmodel import SQLModel, Field
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Optional
 from sqlalchemy import func, Column, DateTime
 
@@ -18,14 +18,6 @@ class Supermarket(SQLModel, table=True):
         sa_column=Column(
             DateTime(timezone=True), 
             server_default=func.now(),
-            nullable=False
-        )
-    )
-    updated_at: datetime = Field(
-        sa_column=Column(
-            DateTime(timezone=True), 
-            server_default=func.now(), 
-            onupdate=func.now(),       
             nullable=False
         )
     )
