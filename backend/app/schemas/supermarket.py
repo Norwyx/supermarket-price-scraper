@@ -13,8 +13,8 @@ class SupermarketBase(SQLModel):
     @classmethod
     def validate_name(cls, v: str) -> str:
         v_clean = v.strip()
-        if len(v_clean) < 3:
-            raise ValueError("Name must be at least 3 characters long")
+        if len(v_clean) < 2:
+            raise ValueError("Name must be at least 2 characters long")
         return v_clean
 
     @field_validator("website_url")
