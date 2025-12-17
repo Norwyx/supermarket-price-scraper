@@ -15,10 +15,10 @@ class Price(SQLModel, table=True):
     )
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    product_id: Optional[int] = Field(index=True, default=None, foreign_key="products.id")
-    supermarket_id: Optional[int] = Field(index=True, default=None, foreign_key="supermarkets.id")
+    product_id: int = Field(index=True, foreign_key="products.id")
+    supermarket_id: int = Field(index=True, foreign_key="supermarkets.id")
     price: float = Field(index=True)
-    url: Optional[str] = Field(default=None)
+    url: Optional[str] = Field(default=None, max_length=500)
     original_price: Optional[float] = Field(default=None)
     scraped_at: datetime = Field(
         sa_column=Column(
