@@ -1,6 +1,7 @@
 from sqlmodel import SQLModel, Field
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Optional
+from sqlalchemy import func, Column, DateTime
 
 
 class Product(SQLModel, table=True):
@@ -16,8 +17,21 @@ class Product(SQLModel, table=True):
     description: Optional[str] = Field(default=None)
     image_url: Optional[str] = Field(default=None, max_length=500)
     category_id: int = Field(index=True, foreign_key="categories.id")
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(
+        sa_column=Column(
+            DateTime(timezone=True), 
+            server_default=func.now(),
+            nullable=False
+        )
+    )
+    updated_at: datetime = Field(
+        sa_column=Column(
+            DateTime(timezone=True), 
+            server_default=func.now(), 
+            onupdate=func.now(),       
+            nullable=False
+        )
+    )
     
     def __repr__(self) -> str:
         return f"Product(id={self.id}, name='{self.name}')"
