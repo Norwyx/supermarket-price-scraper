@@ -4,6 +4,7 @@ from typing import List, Optional
 from app.models.supermarket import Supermarket
 from app.schemas.supermarket import SupermarketCreate, SupermarketUpdate
 
+
 def create_supermarket(session: Session, supermarket_in: SupermarketCreate) -> Supermarket:
     supermarket = Supermarket.model_validate(supermarket_in)
     session.add(supermarket)

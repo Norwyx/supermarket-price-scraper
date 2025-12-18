@@ -30,6 +30,7 @@ class Category(SQLModel, table=True):
         json_schema_extra = {
             "example": {
                 "name": "Fruits",
+                "slug": "fruits",
                 "image_url": "https://image.similarpng.com/file/similarpng/original-picture/2020/08/Group-of-fresh-fruits-on-transparent-background-PNG.png",
             }
         }
