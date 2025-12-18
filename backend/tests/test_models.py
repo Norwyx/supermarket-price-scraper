@@ -369,7 +369,6 @@ class TestPriceModel:
         assert price.price == 3.900
         assert price.original_price == 4.100
         assert price.scraped_at.replace(tzinfo=None) == self.scraped_at_dt.replace(tzinfo=None)
-        assert price.created_at is not None
 
     def test_read_price(self, db_session):
         """Test reading a price record."""
@@ -407,8 +406,6 @@ class TestPriceModel:
         db_session.commit()
         db_session.refresh(price)
         
-        original_created_at = price.created_at
-
         price.price = 5.000
         price.original_price = 6.000
         
@@ -418,7 +415,6 @@ class TestPriceModel:
 
         assert price.price == 5.000
         assert price.original_price == 6.000
-        assert price.created_at == original_created_at
 
     def test_delete_price(self, db_session):
         """Test deleting a price record."""

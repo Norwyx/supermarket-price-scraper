@@ -20,9 +20,10 @@ class Price(SQLModel, table=True):
     price: float = Field(index=True)
     url: Optional[str] = Field(default=None, max_length=500)
     original_price: Optional[float] = Field(default=None)
-    scraped_at: datetime = Field(
+    scraped_at: Optional[datetime] = Field(
+        default_factory=lambda: datetime.now(timezone.utc),
         sa_column=Column(
-            DateTime(timezone=True), 
+            DateTime(timezone=True),
             server_default=func.now(),
             nullable=False
         )
