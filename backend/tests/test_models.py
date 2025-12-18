@@ -1,7 +1,7 @@
 import pytest
+from datetime import datetime, timezone
 from sqlmodel import select
 from dateutil.parser import parse
-from datetime import datetime, timezone
 from app.models import Supermarket, Category, Product, Price, ScrapingJob, ScrapingJobStatus
 
 
