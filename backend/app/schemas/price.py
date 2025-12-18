@@ -31,8 +31,10 @@ class PriceRead(PriceBase):
     id: int
     scraped_at: datetime
 
+
     class Config:
         from_attributes = True
+
 
 class PriceUpdate(SQLModel):
     product_id: Optional[int] = None
