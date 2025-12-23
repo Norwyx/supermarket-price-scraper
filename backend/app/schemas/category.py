@@ -2,6 +2,7 @@ from sqlmodel import SQLModel, Field
 from typing import Optional
 from datetime import datetime
 from pydantic import field_validator
+import re
 
 
 class CategoryBase(SQLModel):
@@ -32,6 +33,7 @@ class CategoryCreate(CategoryBase):
 
 class CategoryRead(CategoryBase):
     id: int
+    parent_id: Optional[int] = None
     created_at: datetime
 
 
