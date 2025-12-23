@@ -17,23 +17,15 @@ def get_product(session: Session, product_id: int) -> Optional[Product]:
     return session.get(Product, product_id)
 
 
-def get_product_by_sku(session: Session, sku: str, supermarket_id: int) -> Optional[Product]:
-    statement = select(Product).where(
-        Product.sku == sku,
-        Product.supermarket_id == None 
-    )
-    return session.exec(statement).first()
-
-
 def get_products(session: Session, skip: int = 0, limit: int = 100) -> List[Product]:
     statement = select(Product).offset(skip).limit(limit)
     return session.exec(statement).all()
 
 
-def get_products_by_supermarket(session: Session, supermarket_id: int, skip: int = 0, limit: int = 100) -> List[Product]:
+def get_products_by_category(session: Session, category_id: int, skip: int = 0, limit: int = 100) -> List[Product]:
     statement = (
         select(Product)
-        .where(Product.supermarket_id == supermarket_id)
+        .where(Product.category_id == category_id)
         .offset(skip)
         .limit(limit)
     )
@@ -56,4 +48,3 @@ def delete_product(session: Session, product_id: int) -> Optional[Product]:
         session.delete(product)
         session.commit()
     return product
-
