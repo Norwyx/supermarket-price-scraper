@@ -10,7 +10,6 @@ class ProductBase(SQLModel):
     sku: Optional[str] = Field(default=None, max_length=100)
     description: Optional[str] = None
     image_url: Optional[str] = Field(default=None, max_length=500)
-    supermarket_id: int = Field(gt=0)
     category_id: int = Field(gt=0)
 
     @field_validator("name")
