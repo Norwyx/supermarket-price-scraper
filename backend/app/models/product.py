@@ -11,7 +11,7 @@ class Product(SQLModel, table=True):
     __tablename__ = "products"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    name: str = Field(index=True, unique=True, max_length=500)
+    name: str = Field(index=True, max_length=500)
     variant: Optional[str] = Field(default=None, max_length=500)
     sku: Optional[str] = Field(index=True, unique=True, default=None, max_length=100)
     description: Optional[str] = Field(default=None)
