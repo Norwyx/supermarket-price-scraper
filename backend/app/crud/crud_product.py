@@ -32,6 +32,25 @@ def get_products_by_category(session: Session, category_id: int, skip: int = 0, 
     return session.exec(statement).all()
 
 
+def search_products(
+    session: Session,
+    query: Optional[str] = None,
+    category_id: Optional[int] = None,
+    skip: int = 0,
+    limit: int = 100
+) -> List[Product]:
+    statement = select(Product)
+    
+    if query:
+        statement = statement.where(Product.name.ilike(f"%{query}%"))
+    
+    if category_id:
+        statement = statement.where(Product.category_id == category_id)
+    
+    statement = statement.offset(skip).limit(limit)
+    return session.exec(statement).all()
+
+
 def update_product(session: Session, db_product: Product, product_in: ProductUpdate) -> Product:
     product_data = product_in.model_dump(exclude_unset=True)
     for key, value in product_data.items():
