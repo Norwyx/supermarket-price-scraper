@@ -50,5 +50,4 @@ class ProductUpdate(SQLModel):
     sku: Optional[str] = Field(default=None, max_length=100)
     description: Optional[str] = None
     image_url: Optional[str] = Field(default=None, max_length=500)
-    supermarket_id: Optional[int] = Field(default=None, gt=0)
     category_id: Optional[int] = Field(default=None, gt=0)
