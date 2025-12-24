@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlmodel import Session
-from typing import List
+from typing import List, Optional
 
 from app.database import get_session
 from app.schemas.product import ProductCreate, ProductRead, ProductUpdate
@@ -24,6 +24,25 @@ def create_product(*, session: Session = Depends(get_session), product_in: Produ
 def read_products(session: Session = Depends(get_session), skip: int = 0, limit: int = 100): 
     """Get all products"""
     products = crud_product.get_products(session=session, skip=skip, limit=limit)
+    return products
+
+
+@router.get("/search", response_model=List[ProductRead])
+def search_products(
+    session: Session = Depends(get_session),
+    q: Optional[str] = None,
+    category_id: Optional[int] = None,
+    skip: int = 0,
+    limit: int = 100
+):
+    """Search products by name, category"""
+    products = crud_product.search_products(
+        session=session,
+        query=q,
+        category_id=category_id,
+        skip=skip,
+        limit=limit
+    )
     return products
 
 
