@@ -3,7 +3,6 @@ from sqlmodel import Session
 from typing import List
 
 from app.database import get_session
-from app.models.supermarket import Supermarket
 from app.schemas.supermarket import SupermarketCreate, SupermarketRead, SupermarketUpdate
 from app.crud import crud_supermarket
 

@@ -35,7 +35,6 @@ class SupermarketCreate(SupermarketBase):
 class SupermarketRead(SupermarketBase):
     id: int
     created_at: datetime
-    updated_at: datetime
 
 
     class Config:
